@@ -1,3 +1,5 @@
+from __future__ import division
+
 from risk_models.claus.claus_tables import (
     ONE_FIRST_DEG_TABLE,
     ONE_SECOND_DEG_TABLE,
@@ -27,7 +29,11 @@ def calculate_risk(
     Calculates the lifteime claus risk score based on age of relatives' breast cancer onset and
     the patient's current cancer-free age.
     """
-    first_degree_indices = collect_and_map_ages_to_indices([mother_onset_age], full_sister_onset_ages, daughter_onset_ages)
+    first_degree_ages = [full_sister_onset_ages, daughter_onset_ages]
+    if mother_onset_age:
+        first_degree_ages.append([mother_onset_age])
+    first_degree_indices = collect_and_map_ages_to_indices(*first_degree_ages)
+
     second_degree_indices = collect_and_map_ages_to_indices(
         maternal_aunt_onset_ages,
         paternal_aunt_onset_ages,
@@ -56,7 +62,7 @@ def calculate_risk(
         mother_index = _bin_age_to_index(mother_onset_age)
 
     # List of scores that match a claus table criteria. We consider lifetime risk to be the maximum value
-    risk_scores = [None]
+    risk_scores = []
 
     if len(first_degree_indices) >= 1:
         risk_scores.append(get_lifetime_risk(ONE_FIRST_DEG_TABLE, patient_age, first_degree_indices[0]))
@@ -81,6 +87,9 @@ def calculate_risk(
 
     if len(maternal_second_degree_indices) >= 1 and len(paternal_second_degree_indices) >= 1:
         risk_scores.append(get_lifetime_risk(TWO_SEC_DEG_DIFF_SIDE_TABLE, patient_age, maternal_second_degree_indices[0], paternal_second_degree_indices[0]))
+
+    if len(risk_scores) == 0:
+        return None
 
     return max(risk_scores)
 
@@ -134,4 +143,4 @@ def map_ages_to_indices(ages):
 
 
 def _bin_age_to_index(age):
-    return (age - 20) / 10
+    return (age - 20) // 10
