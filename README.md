@@ -32,3 +32,17 @@ interpolation between the age buckets specified in the table.
 
 _Example: If patient is age 34, we assume the that risk is half way between the risk,_
 _specified at age 29 and age 39._
+
+## Testing
+
+To run tests with your current python interpreter:
+
+```
+python -m unittest discover -v .
+```
+
+To run Python 2.7/3.6 tests, first make sure you have `tox` installed. Then:
+
+```
+tox
+```
