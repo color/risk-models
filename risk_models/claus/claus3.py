@@ -28,10 +28,12 @@ def calculate_risk(
     if VALID_MAX_AGE < patient_age < VALID_MIN_AGE:
         return 0
 
+    # To support mother's age being loaded in as an int instead of a list
     first_degree_ages = [mother_onset_age] if mother_onset_age else []
     first_degree_ages = sort_ages([x for x in first_degree_ages +
                                    full_sister_onset_ages + daughter_onset_ages if x])
 
+    # Assemble the age categories and do an ascending sort
     second_degree_ages = sort_ages([x for x in
                                     maternal_aunt_onset_ages +
                                     paternal_aunt_onset_ages +
@@ -52,11 +54,13 @@ def calculate_risk(
 
     risk = 0
 
+    # Check for one 1st or 2nd degree relative
     for ages, table in ((first_degree_ages, ONE_FIRST_DEG_TABLE), (second_degree_ages, ONE_SECOND_DEG_TABLE)):
         if ages:
             risk = max(risk, get_lifetime_risk(
                 table, patient_age, _bin_age_to_index(ages[0])))
 
+    # Check for mother and an aunt
     if mother_onset_age:
         for ages, table in ((maternal_aunt_onset_ages, MOTHER_MATERNAL_AUNT), (paternal_aunt_onset_ages, MOTHER_PATERNAL_AUNT)):
             ages = sort_ages(ages)
@@ -64,11 +68,13 @@ def calculate_risk(
                 risk = max(risk, get_lifetime_risk(
                     table, patient_age, _bin_age_to_index(mother_onset_age), _bin_age_to_index(ages[0])))
 
+    # Check for relatives that are both 1st degree or both 2nd degree on the same side
     for ages, table in ((first_degree_ages, TWO_FIRST_DEG_TABLE), (maternal_second_degree_ages, TWO_SEC_DEG_SAME_SIDE_TABLE), (paternal_second_degree_ages, TWO_SEC_DEG_SAME_SIDE_TABLE)):
         if len(ages) > 1:
             risk = max(risk, get_lifetime_risk(table, patient_age,
                                                _bin_age_to_index(ages[0]), _bin_age_to_index(ages[1])))
 
+    # Check for relatives that are on opposite sides
     if maternal_second_degree_ages and paternal_second_degree_ages:
         risk = max(risk, get_lifetime_risk(TWO_SEC_DEG_DIFF_SIDE_TABLE, patient_age,
                                            _bin_age_to_index(maternal_second_degree_ages[0]), _bin_age_to_index(paternal_second_degree_ages[0])))
