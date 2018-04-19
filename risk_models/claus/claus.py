@@ -148,8 +148,7 @@ def _lookup_claus_table(table, patient_index, relative1_index, relative2_index=N
 
 
 def sort_ages(ages):
-    return sorted(
-        [age for age in ages if VALID_MAX_AGE >= age >= VALID_MIN_AGE])
+    return sorted([age for age in ages if VALID_MAX_AGE >= age >= VALID_MIN_AGE])
 
 
 def _bin_age_to_index(age):
