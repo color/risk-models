@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 setup(name="clrriskmodels",
-      version="1.1.0",
+      version="1.1.1",
       description="Color Genomics Risk Models",
       author="Color Genomics",
       author_email="dev@color.com",
